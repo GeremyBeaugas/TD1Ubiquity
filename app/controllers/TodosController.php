@@ -3,6 +3,7 @@ namespace controllers;
 use Ubiquity\attributes\items\router\Get;
 use Ubiquity\attributes\items\router\Post;
 use Ubiquity\attributes\items\router\Route;
+use Ubiquity\utils\http\URequest;
 use Ubiquity\utils\http\USession;
 
 /**
@@ -29,7 +30,7 @@ class TodosController extends \controllers\ControllerBase{
         if($force == false){
             ['message'=>"Créer une nouvelle liste ?"];
         }
-        $list=[];
+        $list= USession::get('list');
         ['message'=>'Liste créée'];
         $this->loadView('TodosController/newList.html',['list'=>$list]);
 
@@ -37,16 +38,40 @@ class TodosController extends \controllers\ControllerBase{
 
 	#[Post(path: "add/",name: "todos.add")]
 	public function addElement(){
-		
+		$v = URequest::post('list');
+        $list = URequest::get(self::ACTIVE_LIST_SESSION_KEY);
+
 		$this->loadView('TodosController/addElement.html');
 
 	}
 
 
+    #[Post(path: "edit/{index}/",name: "todos.edit")]
+    public function editElement($index){
+
+        $v = URequest::post('list');
+        $list = URequest::get(self::ACTIVE_LIST_SESSION_KEY);
+
+        $this->loadView('TodosController/editElement.html');
+
+    }
+
+
+    #[Get(path: "delete/{index}/",name: "todos.delete")]
+    public function deleteElement($index){
+
+        $v = URequest::post('list');
+        $list = URequest::get(self::ACTIVE_LIST_SESSION_KEY);
+
+        $this->loadView('TodosController/deleteElement.html');
+
+    }
+
+
 	#[Get(path: "savesList/",name: "todos.save")]
 	public function saveList(){
-		
-		$this->loadView('TodosController/saveList.html');
+
+		$this->loadView('TodosController/saveList.html',['list'=>$list]);
 
 	}
 
@@ -55,22 +80,6 @@ class TodosController extends \controllers\ControllerBase{
 	public function loadListFromForm(){
 		
 		$this->loadView('TodosController/loadListFromForm.html');
-
-	}
-
-
-	#[Get(path: "delete/{index}/",name: "todos.delete")]
-	public function deleteElement($index){
-		
-		$this->loadView('TodosController/deleteElement.html');
-
-	}
-
-
-	#[Post(path: "edit/{index}/",name: "todos.edit")]
-	public function editElement($index){
-		
-		$this->loadView('TodosController/editElement.html');
 
 	}
 
