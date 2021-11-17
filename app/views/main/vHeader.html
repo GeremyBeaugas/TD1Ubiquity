@@ -14,4 +14,13 @@
 </head>
 <body>
 {% block head %}
+<div class="ui container">
+	<div class="ui secondary inverted menu">
+		<a href="" class="active item">Home</a>
+		<a href="{{path('todos.new')}}" class="item">Nouvelle liste</a>
+		<div class="item right floated">
+			{{_userInfo | raw}}
+		</div>
+	</div>
+</div>
 {% endblock %}

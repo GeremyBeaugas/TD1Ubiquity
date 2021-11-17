@@ -1,5 +1,6 @@
 <?php
 namespace controllers;
+use Ubiquity\attributes\items\router\Get;
 use Ubiquity\attributes\items\router\Post;
 use Ubiquity\cache\CacheManager;
 use Ubiquity\utils\http\UResponse;
@@ -45,11 +46,13 @@ class MyAuth extends \Ubiquity\controllers\auth\AuthController{
 		if(URequest::isPost()){
 			$email=URequest::post($this->_getLoginInputName());
 			$password=URequest::post($this->_getPasswordInputName());
-			//TODO
-			//Loading from the database the user corresponding to the parameters
-			//Checking user creditentials
-			//Returning the user
-            return $email;
+            $key='datas/users'.md5($email);
+            if(CacheManager::$cache->exists($key)){
+                $userInfos=CacheManager::$cache->fetch($key);
+                if($userInfos['login']===$email && URequest::password_verify($this->_getPasswordInputName(),$userInfos['password'])){
+                    return $email;
+                }
+            }
 		}
 		return;
 	}
@@ -70,10 +73,12 @@ class MyAuth extends \Ubiquity\controllers\auth\AuthController{
 		return new MyAuthFiles();
 	}
 
+    public function _displayInfoAsString(){
+        return true;
+    }
 
 
-
-	#[Route(path: "newUser",name: "myAuth.newUserForm")]
+    #[Get(path: "newUser",name: "myAuth.newUserForm")]
 	public function newUserForm(){
 		
 		$this->loadView('MyAuth/newUserForm.html');
@@ -81,12 +86,15 @@ class MyAuth extends \Ubiquity\controllers\auth\AuthController{
 	}
 
 
-	#[Post(path: "newUser",name: "login.newUser")]
+	#[Post(path: "newUser",name: "myAuth.newUser")]
 	public function newUser(){
-		$key='datas/users'.md5(URequest::post('email'));
-        if(CacheManager::$cache->exists($key)){
-            CacheManager::$cache->store($key,['login'=>URequest::post('email'),'password'=>URequest::password_hash('password')]);
-            $this->showMessage('Création de compte',"Votre compte a été créé avec l'email <b>$email</b>",'success');
+        $email=URequest::post('email');
+		$key='datas/users-'.md5($email);
+        if(!CacheManager::$cache->exists($key)){
+            CacheManager::$cache->store($key,['login'=>$email,'password'=>URequest::password_hash('password')]);
+            $this->showMessage('Création de compte',"Votre compte a été créé avec l'email <b>$email</b>",'success','user');
+        }else{
+            $this->showMessage('Création de compte',"Vous avez déjà un compte avec l'email <b>$email</b>",'error','user');
         }
 	}
 

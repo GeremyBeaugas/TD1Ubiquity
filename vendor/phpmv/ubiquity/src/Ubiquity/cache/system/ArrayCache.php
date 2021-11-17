@@ -63,6 +63,7 @@ class ArrayCache extends AbstractDataCache {
 
 	public function store($key, $code, $tag = null) {
 		$content = $code;
+        var_dump($key);
 		if (\is_array($code)) {
 			$content = self::PHP_TAG . 'return ' . UArray::asPhpArray($code, 'array') . ";\n";
 		}
