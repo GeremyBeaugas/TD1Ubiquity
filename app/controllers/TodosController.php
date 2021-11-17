@@ -3,6 +3,8 @@ namespace controllers;
 use Ubiquity\attributes\items\router\Get;
 use Ubiquity\attributes\items\router\Post;
 use Ubiquity\attributes\items\router\Route;
+use Ubiquity\controllers\auth\AuthController;
+use Ubiquity\controllers\auth\WithAuthTrait;
 use Ubiquity\utils\http\URequest;
 use Ubiquity\utils\http\USession;
 
@@ -12,7 +14,7 @@ use Ubiquity\utils\http\USession;
 #[Route('/todos/')]
 class TodosController extends \controllers\ControllerBase{
 
-
+    use WithAuthTrait;
     const CACHE_KEY = 'datas/lists/';
     const EMPTY_LIST_ID='not saved';
     const LIST_SESSION_KEY='list';
@@ -106,4 +108,8 @@ class TodosController extends \controllers\ControllerBase{
 
 	}
 
+    protected function getAuthController(): AuthController
+    {
+        return new MyAuth($this);
+    }
 }
